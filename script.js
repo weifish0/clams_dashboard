@@ -23,7 +23,6 @@ const elements = {
     doVal: document.getElementById('val-do'),
     hmVal: document.getElementById('val-hm'),
     turbVal: document.getElementById('val-turb'),
-    logList: document.getElementById('log-list'),
     sysStatus: document.getElementById('sys-status'),
     sysStatusText: document.getElementById('sys-status-text')
 };
@@ -110,7 +109,11 @@ function fluctuateData() {
 
 // Simulate Pollution Event
 window.simulatePollution = function(factoryId) {
-    if (state.isAlerting) return;
+    if (state.isAlerting && state.alertSource === factoryId) return; // Ignore if already alerting for same factory
+    
+    if (state.isAlerting) {
+        resetSystem(true); // Silent reset without logging
+    }
     
     const factory = state.factories[factoryId];
     const targetClamId = factory.targetClam;
@@ -142,7 +145,7 @@ window.simulatePollution = function(factoryId) {
 }
 
 // Reset System
-window.resetSystem = function() {
+window.resetSystem = function(silent = false) {
     state.isAlerting = false;
     state.alertSource = null;
     
@@ -155,38 +158,36 @@ window.resetSystem = function() {
     // Reset visuals
     document.querySelectorAll('.clam').forEach(c => c.classList.remove('alert'));
     elements.sysStatus.classList.remove('alert');
+    elements.sysStatusText.textContent = '系統監控中';
     
     updateDashboard();
-    addLog('系統已重置。恢復正常監測。', false);
+    if (!silent) {
+        addLog('系統已重置。恢復正常監測。', false);
+    }
 }
 
 function addLog(message, isAlert) {
-    const li = document.createElement('li');
-    li.className = `log-item ${isAlert ? 'alert' : ''}`;
+    const toast = document.createElement('div');
+    toast.className = `toast-msg ${isAlert ? 'alert' : ''}`;
     
     const time = new Date().toLocaleTimeString();
     
-    li.innerHTML = `
-        <span class="log-time">${time}</span>
-        <span class="log-message">${message}</span>
+    toast.innerHTML = `
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.3rem;">${time}</div>
+        <div style="line-height: 1.4;">${message}</div>
     `;
     
-    elements.logList.prepend(li);
-}
-
-// Toggle Sidebar
-window.toggleSidebar = function() {
-    const sidebar = document.getElementById('main-sidebar');
-    const icon = document.getElementById('sidebar-toggle-icon');
-    
-    sidebar.classList.toggle('collapsed');
-    
-    if (sidebar.classList.contains('collapsed')) {
-        icon.classList.remove('fa-chevron-right');
-        icon.classList.add('fa-chevron-left');
-    } else {
-        icon.classList.remove('fa-chevron-left');
-        icon.classList.add('fa-chevron-right');
+    const container = document.getElementById('toast-container');
+    if (container) {
+        container.appendChild(toast);
+        
+        // Auto remove toast after 6 seconds
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            toast.addEventListener('animationend', () => {
+                toast.remove();
+            });
+        }, 6000);
     }
 }
 

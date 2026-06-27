@@ -14,11 +14,47 @@
             <i class="fa-solid fa-water"></i>
             <h1>RiverGuard <span style="font-weight: 300; font-size: 1.2rem; color: var(--text-secondary);">| 人工蛤蜊監測儀表板</span></h1>
         </div>
+        <div class="nav-controls">
+            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-a')">工廠 A</button>
+            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-b')">工廠 B</button>
+            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-c')">工廠 C</button>
+            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-d')">工廠 D</button>
+            <button class="btn btn-sm" style="background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);" onclick="resetSystem()"><i class="fa-solid fa-rotate-right"></i></button>
+            <div class="system-status" id="sys-status" style="margin-left: 1rem;">
+                <div class="status-dot"></div>
+                <span id="sys-status-text">系統監控中</span>
+            </div>
+        </div>
     </header>
 
     <main>
         <!-- 地圖背景層 -->
         <div class="map-container">
+            <!-- 水質數據橫幅 -->
+            <div class="metrics-banner glass-panel">
+                <div style="display: flex; align-items: center; padding-right: 1.2rem; border-right: 1px solid var(--border-color); margin-right: 1.2rem;">
+                    <h2 style="margin: 0; font-size: 0.95rem; white-space: nowrap;"><i class="fa-solid fa-chart-line"></i> 實時水質數據</h2>
+                </div>
+                
+                <div class="metric-row">
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-flask"></i> 酸鹼度 (pH)</div>
+                        <div><span id="val-ph" class="metric-value">--</span> <span class="metric-unit">pH</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-droplet"></i> 溶氧量 (DO)</div>
+                        <div><span id="val-do" class="metric-value">--</span> <span class="metric-unit">mg/L</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-weight-hanging"></i> 重金屬殘留</div>
+                        <div><span id="val-hm" class="metric-value">--</span> <span class="metric-unit">ppm</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-water"></i> 濁度</div>
+                        <div><span id="val-turb" class="metric-value">--</span> <span class="metric-unit">NTU</span></div>
+                    </div>
+                </div>
+            </div>
             <!-- 模擬河流 SVG (已在CSS隱藏，僅作保留) -->
                 <svg class="river-path" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <path d="M 10,0 C 20,30 10,60 50,80 C 80,90 90,100 90,100" fill="none" stroke="rgba(88, 166, 255, 0.15)" stroke-width="4" stroke-linecap="round"/>
@@ -65,64 +101,11 @@
                     <div class="node-label">蛤蜊 04 (出海口)</div>
                 </div>
             </div>
-        <!-- 右側：數據面板與控制 -->
-        <aside class="sidebar" id="main-sidebar">
-            <button id="sidebar-toggle" onclick="toggleSidebar()" class="sidebar-toggle-btn">
-                <i class="fa-solid fa-chevron-right" id="sidebar-toggle-icon" style="transition: transform 0.3s ease;"></i>
-            </button>
-
-            <!-- 實時數據卡片 -->
-            <div class="glass-panel" id="panel-metrics">
-                <div class="panel-header" style="margin-bottom: 0;">
-                    <h2 style="margin: 0;"><i class="fa-solid fa-chart-line"></i> 實時水質數據</h2>
-                </div>
-                
-                <div id="content-metrics" style="margin-top: 1.5rem;">
-                    <div class="metric-grid">
-                        <div class="metric-card">
-                            <div class="metric-name"><i class="fa-solid fa-flask"></i> 酸鹼度 (pH)</div>
-                            <div><span id="val-ph" class="metric-value">--</span> <span class="metric-unit">pH</span></div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-name"><i class="fa-solid fa-droplet"></i> 溶氧量 (DO)</div>
-                            <div><span id="val-do" class="metric-value">--</span> <span class="metric-unit">mg/L</span></div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-name"><i class="fa-solid fa-weight-hanging"></i> 重金屬殘留</div>
-                            <div><span id="val-hm" class="metric-value">--</span> <span class="metric-unit">ppm</span></div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-name"><i class="fa-solid fa-water"></i> 濁度</div>
-                            <div><span id="val-turb" class="metric-value">--</span> <span class="metric-unit">NTU</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 事件日誌與模擬控制 -->
-            <div class="glass-panel event-log" id="panel-logs">
-                <div class="panel-header" style="margin-bottom: 0;">
-                    <h2 style="margin: 0;"><i class="fa-solid fa-list-ul"></i> 事件日誌</h2>
-                </div>
-                
-                <div id="content-logs" style="margin-top: 1rem; display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-                    <ul class="log-list" id="log-list">
-                        <!-- Logs will be inserted here via JS -->
-                    </ul>
-
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                        <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0;">
-                            <button class="btn btn-danger" onclick="simulatePollution('factory-a')">工廠 A 異常</button>
-                            <button class="btn btn-danger" onclick="simulatePollution('factory-b')">工廠 B 異常</button>
-                            <button class="btn btn-danger" onclick="simulatePollution('factory-c')">工廠 C 異常</button>
-                            <button class="btn btn-danger" onclick="simulatePollution('factory-d')">工廠 D 異常</button>
-                        </div>
-                        <button class="btn" style="width: 100%; margin-top: 0.5rem; background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);" onclick="resetSystem()"><i class="fa-solid fa-rotate-right"></i> 系統重置</button>
-                    </div>
-                </div>
-            </div>
-        </aside>
+        </div>
     </main>
+
+    <!-- 浮動日誌 (Toast) 容器 -->
+    <div id="toast-container" class="toast-container"></div>
 
     <script src="script.js"></script>
 </body>
