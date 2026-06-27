@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiverGuard | 人工蛤蜊水質監測網</title>
+    <meta name="description" content="Dashboard for Artificial Clam Water Quality Monitoring Network">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-water"></i>
+            <h1>RiverGuard <span style="font-weight: 300; font-size: 1.2rem; color: var(--text-secondary);">| 人工蛤蜊監測儀表板</span></h1>
+        </div>
+    </header>
+
+    <main>
+        <!-- 地圖背景層 -->
+        <div class="map-container">
+            <!-- 模擬河流 SVG (已在CSS隱藏，僅作保留) -->
+                <svg class="river-path" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M 10,0 C 20,30 10,60 50,80 C 80,90 90,100 90,100" fill="none" stroke="rgba(88, 166, 255, 0.15)" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M 80,0 C 70,20 80,40 50,80" fill="none" stroke="rgba(88, 166, 255, 0.15)" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+
+                <!-- 節點 A -->
+                <div class="node factory" id="factory-a" title="工廠 A">
+                    <div class="node-icon"><i class="fa-solid fa-industry"></i></div>
+                    <div class="node-label">工廠 A</div>
+                </div>
+                <div class="node clam" id="clam-1" title="人工蛤蜊 01">
+                    <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                    <div class="node-label">蛤蜊 01</div>
+                </div>
+
+                <!-- 節點 B -->
+                <div class="node factory" id="factory-b" title="工廠 B">
+                    <div class="node-icon"><i class="fa-solid fa-industry"></i></div>
+                    <div class="node-label">工廠 B</div>
+                </div>
+                <div class="node clam" id="clam-2" title="人工蛤蜊 02">
+                    <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                    <div class="node-label">蛤蜊 02</div>
+                </div>
+
+                <!-- 節點 C -->
+                <div class="node factory" id="factory-c" title="工廠 C">
+                    <div class="node-icon"><i class="fa-solid fa-industry"></i></div>
+                    <div class="node-label">工廠 C</div>
+                </div>
+                <div class="node clam" id="clam-3" title="人工蛤蜊 03">
+                    <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                    <div class="node-label">蛤蜊 03</div>
+                </div>
+
+                <!-- 節點 D -->
+                <div class="node factory" id="factory-d" title="工廠 D">
+                    <div class="node-icon"><i class="fa-solid fa-industry"></i></div>
+                    <div class="node-label">工廠 D</div>
+                </div>
+                <div class="node clam" id="clam-4" title="人工蛤蜊 04">
+                    <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                    <div class="node-label">蛤蜊 04 (出海口)</div>
+                </div>
+            </div>
+        <!-- 右側：數據面板與控制 -->
+        <aside class="sidebar" id="main-sidebar">
+            <button id="sidebar-toggle" onclick="toggleSidebar()" class="sidebar-toggle-btn">
+                <i class="fa-solid fa-chevron-right" id="sidebar-toggle-icon" style="transition: transform 0.3s ease;"></i>
+            </button>
+
+            <!-- 實時數據卡片 -->
+            <div class="glass-panel" id="panel-metrics">
+                <div class="panel-header" style="margin-bottom: 0;">
+                    <h2 style="margin: 0;"><i class="fa-solid fa-chart-line"></i> 實時水質數據</h2>
+                </div>
+                
+                <div id="content-metrics" style="margin-top: 1.5rem;">
+                    <div class="metric-grid">
+                        <div class="metric-card">
+                            <div class="metric-name"><i class="fa-solid fa-flask"></i> 酸鹼度 (pH)</div>
+                            <div><span id="val-ph" class="metric-value">--</span> <span class="metric-unit">pH</span></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-name"><i class="fa-solid fa-droplet"></i> 溶氧量 (DO)</div>
+                            <div><span id="val-do" class="metric-value">--</span> <span class="metric-unit">mg/L</span></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-name"><i class="fa-solid fa-weight-hanging"></i> 重金屬殘留</div>
+                            <div><span id="val-hm" class="metric-value">--</span> <span class="metric-unit">ppm</span></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-name"><i class="fa-solid fa-water"></i> 濁度</div>
+                            <div><span id="val-turb" class="metric-value">--</span> <span class="metric-unit">NTU</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 事件日誌與模擬控制 -->
+            <div class="glass-panel event-log" id="panel-logs">
+                <div class="panel-header" style="margin-bottom: 0;">
+                    <h2 style="margin: 0;"><i class="fa-solid fa-list-ul"></i> 事件日誌</h2>
+                </div>
+                
+                <div id="content-logs" style="margin-top: 1rem; display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                    <ul class="log-list" id="log-list">
+                        <!-- Logs will be inserted here via JS -->
+                    </ul>
+
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0;">
+                            <button class="btn btn-danger" onclick="simulatePollution('factory-a')">工廠 A 異常</button>
+                            <button class="btn btn-danger" onclick="simulatePollution('factory-b')">工廠 B 異常</button>
+                            <button class="btn btn-danger" onclick="simulatePollution('factory-c')">工廠 C 異常</button>
+                            <button class="btn btn-danger" onclick="simulatePollution('factory-d')">工廠 D 異常</button>
+                        </div>
+                        <button class="btn" style="width: 100%; margin-top: 0.5rem; background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);" onclick="resetSystem()"><i class="fa-solid fa-rotate-right"></i> 系統重置</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
