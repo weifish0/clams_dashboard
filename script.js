@@ -4,10 +4,10 @@ const state = {
     isAlerting: false,
     alertSource: null,
     clams: {
-        'clam-1': { name: 'Clam Sensor 01', location: 'Downstream A', ph: 7.2, do: 8.5, hm: 0.01, turb: 12 },
-        'clam-2': { name: 'Clam Sensor 02', location: 'Downstream B', ph: 7.1, do: 8.2, hm: 0.02, turb: 15 },
-        'clam-3': { name: 'Clam Sensor 03', location: 'Downstream C', ph: 7.3, do: 8.0, hm: 0.01, turb: 10 },
-        'clam-4': { name: 'Clam Sensor 04', location: 'Estuary / Main', ph: 7.4, do: 8.6, hm: 0.01, turb: 18 }
+        'clam-1': { name: 'Clam Sensor 01', location: 'Downstream A', closure: 12.0, ph: 7.2, do: 8.5, ec: 310, turb: 12 },
+        'clam-2': { name: 'Clam Sensor 02', location: 'Downstream B', closure: 8.5, ph: 7.1, do: 8.2, ec: 290, turb: 15 },
+        'clam-3': { name: 'Clam Sensor 03', location: 'Downstream C', closure: 15.2, ph: 7.3, do: 8.0, ec: 330, turb: 10 },
+        'clam-4': { name: 'Clam Sensor 04', location: 'Estuary / Main', closure: 5.4, ph: 7.4, do: 8.6, ec: 300, turb: 18 }
     },
     factories: {
         'factory-a': { name: 'Factory A', targetClam: 'clam-1' },
@@ -19,9 +19,10 @@ const state = {
 
 // DOM Elements
 const elements = {
+    closureVal: document.getElementById('val-closure'),
     phVal: document.getElementById('val-ph'),
     doVal: document.getElementById('val-do'),
-    hmVal: document.getElementById('val-hm'),
+    ecVal: document.getElementById('val-ec'),
     turbVal: document.getElementById('val-turb'),
     sysStatus: document.getElementById('sys-status'),
     sysStatusText: document.getElementById('sys-status-text')
@@ -61,15 +62,17 @@ function updateDashboard() {
     const data = state.clams[state.selectedClamId];
     
     // Update values with some formatting
+    elements.closureVal.textContent = data.closure.toFixed(1);
     elements.phVal.textContent = data.ph.toFixed(2);
     elements.doVal.textContent = data.do.toFixed(1);
-    elements.hmVal.textContent = data.hm.toFixed(3);
+    elements.ecVal.textContent = data.ec.toFixed(0);
     elements.turbVal.textContent = data.turb.toFixed(1);
 
     // Color code based on thresholds (mock thresholds)
+    updateStatusClass(elements.closureVal, data.closure, 0, 30); // Closure should be low (<30%)
     updateStatusClass(elements.phVal, data.ph, 6.5, 8.5); // pH safe range 6.5 - 8.5
     updateStatusClass(elements.doVal, data.do, 5.0, 20.0, true); // DO needs to be high
-    updateStatusClass(elements.hmVal, data.hm, 0.0, 0.05); // Heavy metals should be low
+    updateStatusClass(elements.ecVal, data.ec, 0, 800); // EC should be low (<800)
     updateStatusClass(elements.turbVal, data.turb, 0, 30); // Turbidity should be low
 }
 
@@ -92,9 +95,10 @@ function fluctuateData() {
     
     Object.keys(state.clams).forEach(id => {
         const c = state.clams[id];
+        c.closure = Math.max(0, Math.min(100, c.closure + (Math.random() - 0.5) * 5));
         c.ph += (Math.random() - 0.5) * 0.05;
         c.do += (Math.random() - 0.5) * 0.2;
-        c.hm = Math.max(0, c.hm + (Math.random() - 0.5) * 0.002);
+        c.ec = Math.max(0, c.ec + (Math.random() - 0.5) * 10);
         c.turb = Math.max(0, c.turb + (Math.random() - 0.5) * 1);
         
         // Keep within reasonable bounds
@@ -122,38 +126,57 @@ window.simulatePollution = function(factoryId) {
     state.isAlerting = true;
     state.alertSource = factoryId;
 
-    // Drastically change metrics for the affected clam
-    clam.ph = 5.2; // Acidic
-    clam.hm = 0.15; // High heavy metals
-    clam.do = 3.5; // Low oxygen
-    clam.turb = 85.0; // High turbidity
-
-    // Visual Alert on map
-    document.getElementById(targetClamId).classList.add('alert');
-    
-    // System status
-    elements.sysStatus.classList.add('alert');
-    elements.sysStatusText.textContent = '發現污染源！';
+    // --- Stage 1: Biological Alert (Closure Rate Spikes) ---
+    clam.closure = 85.5; // Huge spike in closure rate
     
     // Auto-select the affected clam to show data
     selectClam(targetClamId);
     
+    // System status
+    elements.sysStatus.classList.add('alert');
+    elements.sysStatusText.textContent = '觀測到異常閉合，啟動感測器...';
+    
     // Log event
-    const time = new Date().toLocaleTimeString();
-    const msg = `嚴重水質異常警告！位於 <strong>${clam.name}</strong> 檢測到水質急遽惡化。軌跡推算污染源極可能來自 <strong>${factory.name}</strong>。`;
-    addLog(msg, true);
+    const time1 = new Date().toLocaleTimeString();
+    const msg1 = `【階段一】位於 <strong>${clam.name}</strong> 的蛤蜊群體觀測到異常的大規模閉合行為 (閉合率達 85.5%)。系統已自動啟動該區域水質進階感測程序...`;
+    addLog(msg1, true);
+
+    // --- Stage 2: Sensor Confirmation (After 3.5 seconds) ---
+    state.alertTimeout = setTimeout(() => {
+        // Drastically change metrics for the affected clam
+        clam.ph = 5.2; // Acidic
+        clam.ec = 1650; // High EC
+        clam.do = 3.5; // Low oxygen
+        clam.turb = 85.0; // High turbidity
+        
+        // Visual Alert on map
+        document.getElementById(targetClamId).classList.add('alert');
+        
+        elements.sysStatusText.textContent = '確認污染，已派員採樣！';
+        
+        updateDashboard();
+        
+        const time2 = new Date().toLocaleTimeString();
+        const msg2 = `【階段二】水質感測器回報：<strong>${clam.name}</strong> 導電度 (EC) 飆升至 1650 μS/cm，酸鹼度異常。軌跡推算污染源極可能來自 <strong>${factory.name}</strong>，已自動派員前往採樣！`;
+        addLog(msg2, true);
+    }, 3500);
 }
 
 // Reset System
 window.resetSystem = function(silent = false) {
+    if (state.alertTimeout) {
+        clearTimeout(state.alertTimeout);
+        state.alertTimeout = null;
+    }
+
     state.isAlerting = false;
     state.alertSource = null;
     
     // Reset Data
-    state.clams['clam-1'] = { name: 'Clam Sensor 01', location: 'Downstream A', ph: 7.2, do: 8.5, hm: 0.01, turb: 12 };
-    state.clams['clam-2'] = { name: 'Clam Sensor 02', location: 'Downstream B', ph: 7.1, do: 8.2, hm: 0.02, turb: 15 };
-    state.clams['clam-3'] = { name: 'Clam Sensor 03', location: 'Downstream C', ph: 7.3, do: 8.0, hm: 0.01, turb: 10 };
-    state.clams['clam-4'] = { name: 'Clam Sensor 04', location: 'Estuary / Main', ph: 7.4, do: 8.6, hm: 0.01, turb: 18 };
+    state.clams['clam-1'] = { name: 'Clam Sensor 01', location: 'Downstream A', closure: 12.0, ph: 7.2, do: 8.5, ec: 310, turb: 12 };
+    state.clams['clam-2'] = { name: 'Clam Sensor 02', location: 'Downstream B', closure: 8.5, ph: 7.1, do: 8.2, ec: 290, turb: 15 };
+    state.clams['clam-3'] = { name: 'Clam Sensor 03', location: 'Downstream C', closure: 15.2, ph: 7.3, do: 8.0, ec: 330, turb: 10 };
+    state.clams['clam-4'] = { name: 'Clam Sensor 04', location: 'Estuary / Main', closure: 5.4, ph: 7.4, do: 8.6, ec: 300, turb: 18 };
     
     // Reset visuals
     document.querySelectorAll('.clam').forEach(c => c.classList.remove('alert'));

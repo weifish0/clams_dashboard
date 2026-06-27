@@ -38,6 +38,10 @@
                 
                 <div class="metric-row">
                     <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-clapperboard"></i> 閉合率</div>
+                        <div><span id="val-closure" class="metric-value">--</span> <span class="metric-unit">%</span></div>
+                    </div>
+                    <div class="metric-item">
                         <div class="metric-name"><i class="fa-solid fa-flask"></i> 酸鹼度 (pH)</div>
                         <div><span id="val-ph" class="metric-value">--</span> <span class="metric-unit">pH</span></div>
                     </div>
@@ -46,8 +50,8 @@
                         <div><span id="val-do" class="metric-value">--</span> <span class="metric-unit">mg/L</span></div>
                     </div>
                     <div class="metric-item">
-                        <div class="metric-name"><i class="fa-solid fa-weight-hanging"></i> 重金屬殘留</div>
-                        <div><span id="val-hm" class="metric-value">--</span> <span class="metric-unit">ppm</span></div>
+                        <div class="metric-name"><i class="fa-solid fa-bolt"></i> 導電度 (EC)</div>
+                        <div><span id="val-ec" class="metric-value">--</span> <span class="metric-unit">μS/cm</span></div>
                     </div>
                     <div class="metric-item">
                         <div class="metric-name"><i class="fa-solid fa-water"></i> 濁度</div>
@@ -67,6 +71,7 @@
                     <div class="node-label">工廠 A</div>
                 </div>
                 <div class="node clam" id="clam-1" title="人工蛤蜊 01">
+                    <div class="heatmap-zone"></div>
                     <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div class="node-label">蛤蜊 01</div>
                 </div>
@@ -77,6 +82,7 @@
                     <div class="node-label">工廠 B</div>
                 </div>
                 <div class="node clam" id="clam-2" title="人工蛤蜊 02">
+                    <div class="heatmap-zone"></div>
                     <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div class="node-label">蛤蜊 02</div>
                 </div>
@@ -87,6 +93,7 @@
                     <div class="node-label">工廠 C</div>
                 </div>
                 <div class="node clam" id="clam-3" title="人工蛤蜊 03">
+                    <div class="heatmap-zone"></div>
                     <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div class="node-label">蛤蜊 03</div>
                 </div>
@@ -97,6 +104,7 @@
                     <div class="node-label">工廠 D</div>
                 </div>
                 <div class="node clam" id="clam-4" title="人工蛤蜊 04">
+                    <div class="heatmap-zone"></div>
                     <div class="node-icon"><i class="fa-solid fa-satellite-dish"></i></div>
                     <div class="node-label">蛤蜊 04 (出海口)</div>
                 </div>
