@@ -14,15 +14,55 @@
             <i class="fa-solid fa-water"></i>
             <h1>RiverGuard <span style="font-weight: 300; font-size: 1.2rem; color: var(--text-secondary);">| 人工蛤蜊監測儀表板</span></h1>
         </div>
-        <div class="nav-controls">
-            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-a')">工廠 A</button>
-            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-b')">工廠 B</button>
-            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-c')">工廠 C</button>
-            <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-d')">工廠 D</button>
-            <button class="btn btn-sm" style="background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);" onclick="resetSystem()"><i class="fa-solid fa-rotate-right"></i></button>
-            <div class="system-status" id="sys-status" style="margin-left: 1rem;">
-                <div class="status-dot"></div>
-                <span id="sys-status-text">系統監控中</span>
+        
+        <!-- 水質數據橫幅 (手機版顯示於標題列，電腦版絕對定位於地圖上方) -->
+        <div class="metrics-banner glass-panel" id="metrics-banner">
+            <div style="display: flex; align-items: center; padding-right: 0.8rem; border-right: 1px solid var(--border-color); margin-right: 0.8rem;">
+                <h2 style="margin: 0; font-size: 0.95rem; white-space: nowrap;"><i class="fa-solid fa-chart-line"></i> 實時水質數據</h2>
+            </div>
+            
+            <div class="metric-row">
+                <div class="metric-item">
+                    <div class="metric-name"><i class="fa-solid fa-clapperboard"></i> 閉合率</div>
+                    <div><span id="val-closure" class="metric-value">--</span> <span class="metric-unit">%</span></div>
+                </div>
+                <div class="extra-metrics" id="extra-metrics">
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-flask"></i> 酸鹼度 (pH)</div>
+                        <div><span id="val-ph" class="metric-value">--</span> <span class="metric-unit">pH</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-droplet"></i> 溶氧量 (DO)</div>
+                        <div><span id="val-do" class="metric-value">--</span> <span class="metric-unit">mg/L</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-bolt"></i> 導電度 (EC)</div>
+                        <div><span id="val-ec" class="metric-value">--</span> <span class="metric-unit">μS/cm</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-name"><i class="fa-solid fa-water"></i> 濁度</div>
+                        <div><span id="val-turb" class="metric-value">--</span> <span class="metric-unit">NTU</span></div>
+                    </div>
+                </div>
+                <button class="btn-toggle-metrics" id="btn-toggle-metrics" aria-label="展開水質數據" title="展開水質數據">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="nav-controls">
+                <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-a')">工廠 A</button>
+                <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-b')">工廠 B</button>
+                <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-c')">工廠 C</button>
+                <button class="btn btn-danger btn-sm" onclick="simulatePollution('factory-d')">工廠 D</button>
+            </div>
+            <div class="status-bar">
+                <div class="system-status" id="sys-status">
+                    <div class="status-dot"></div>
+                    <span id="sys-status-text">系統監控中</span>
+                </div>
+                <button class="btn btn-sm" style="background: rgba(88, 166, 255, 0.1); color: var(--accent-blue);" onclick="resetSystem()"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
         </div>
     </header>
@@ -30,40 +70,6 @@
     <main>
         <!-- 地圖背景層 -->
         <div class="map-container">
-            <!-- 水質數據橫幅 -->
-            <div class="metrics-banner glass-panel" id="metrics-banner">
-                <div style="display: flex; align-items: center; padding-right: 0.8rem; border-right: 1px solid var(--border-color); margin-right: 0.8rem;">
-                    <h2 style="margin: 0; font-size: 0.95rem; white-space: nowrap;"><i class="fa-solid fa-chart-line"></i> 實時水質數據</h2>
-                </div>
-                
-                <div class="metric-row">
-                    <div class="metric-item">
-                        <div class="metric-name"><i class="fa-solid fa-clapperboard"></i> 閉合率</div>
-                        <div><span id="val-closure" class="metric-value">--</span> <span class="metric-unit">%</span></div>
-                    </div>
-                    <div class="extra-metrics" id="extra-metrics">
-                        <div class="metric-item">
-                            <div class="metric-name"><i class="fa-solid fa-flask"></i> 酸鹼度 (pH)</div>
-                            <div><span id="val-ph" class="metric-value">--</span> <span class="metric-unit">pH</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-name"><i class="fa-solid fa-droplet"></i> 溶氧量 (DO)</div>
-                            <div><span id="val-do" class="metric-value">--</span> <span class="metric-unit">mg/L</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-name"><i class="fa-solid fa-bolt"></i> 導電度 (EC)</div>
-                            <div><span id="val-ec" class="metric-value">--</span> <span class="metric-unit">μS/cm</span></div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-name"><i class="fa-solid fa-water"></i> 濁度</div>
-                            <div><span id="val-turb" class="metric-value">--</span> <span class="metric-unit">NTU</span></div>
-                        </div>
-                    </div>
-                    <button class="btn-toggle-metrics" id="btn-toggle-metrics" aria-label="展開水質數據" title="展開水質數據">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
             <!-- 模擬河流 SVG (已在CSS隱藏，僅作保留) -->
                 <svg class="river-path" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <path d="M 10,0 C 20,30 10,60 50,80 C 80,90 90,100 90,100" fill="none" stroke="rgba(88, 166, 255, 0.15)" stroke-width="4" stroke-linecap="round"/>
