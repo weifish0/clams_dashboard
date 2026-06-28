@@ -538,6 +538,7 @@ main {
         align-items: flex-start;
         gap: 0.5rem;
         grid-column: 1 / 2;
+        grid-row: 2 / span 2;
     }
 
     .metrics-banner > div:first-child {
@@ -621,17 +622,30 @@ main {
         align-items: center;
     }
 
-    /* 調整手機版提醒訊息的大小 */
+    /* 調整手機版提醒訊息的大小與位置 */
     .toast-msg {
         padding: 0.6rem 0.8rem;
         font-size: 0.8rem;
-        max-width: 280px;
+        max-width: 100%;
+        width: 100%;
         border-left-width: 3px;
+        margin: 0;
+        box-sizing: border-box;
     }
 
     .toast-container {
-        bottom: 1rem;
-        left: 1rem;
-        gap: 0.5rem;
+        position: static;
+        grid-column: 2 / 3;
+        width: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        pointer-events: auto;
+    }
+
+    /* 只顯示最新的一筆 log */
+    #toast-container .toast-msg:not(:last-child) {
+        display: none !important;
     }
 }

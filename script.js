@@ -53,7 +53,7 @@ function init() {
     setInterval(fluctuateData, 2000);
 
     // Add initial log
-    addLog('系統已初始化。人工蛤蜊監測網上線。', false);
+    addLog('系統已初始化，監測網已上線。', false);
 }
 
 // Toggle advanced metrics panel
@@ -168,7 +168,7 @@ window.simulatePollution = function(factoryId) {
 
     // Log event
     const time1 = new Date().toLocaleTimeString();
-    const msg1 = `【階段一】位於 <strong>${clam.name}</strong> 的蛤蜊群體觀測到異常的大規模閉合行為 (閉合率達 85.5%)。系統已自動啟動該區域水質進階感測程序...`;
+    const msg1 = `【階段一】<strong>${clam.name}</strong> 異常閉合 (85.5%)，已啟動水質偵測。`;
     addLog(msg1, true);
 
     // --- Stage 2: Sensor Confirmation (After 3.5 seconds) ---
@@ -187,7 +187,7 @@ window.simulatePollution = function(factoryId) {
         updateDashboard();
         
         const time2 = new Date().toLocaleTimeString();
-        const msg2 = `【階段二】水質感測器回報：<strong>${clam.name}</strong> 導電度 (EC) 飆升至 1650 μS/cm，酸鹼度異常。軌跡推算污染源極可能來自 <strong>${factory.name}</strong>，已自動派員前往採樣！`;
+        const msg2 = `【階段二】<strong>${clam.name}</strong> 水質異常，研判污染源為 <strong>${factory.name}</strong>，已派員採樣。`;
         addLog(msg2, true);
     }, 3500);
 }
@@ -218,7 +218,7 @@ window.resetSystem = function(silent = false) {
 
     updateDashboard();
     if (!silent) {
-        addLog('系統已重置。恢復正常監測。', false);
+        addLog('系統已重置，恢復監測。', false);
     }
 }
 
