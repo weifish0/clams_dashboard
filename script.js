@@ -25,7 +25,9 @@ const elements = {
     ecVal: document.getElementById('val-ec'),
     turbVal: document.getElementById('val-turb'),
     sysStatus: document.getElementById('sys-status'),
-    sysStatusText: document.getElementById('sys-status-text')
+    sysStatusText: document.getElementById('sys-status-text'),
+    extraMetrics: document.getElementById('extra-metrics'),
+    btnToggleMetrics: document.getElementById('btn-toggle-metrics')
 };
 
 // Initialize
@@ -37,14 +39,39 @@ function init() {
         });
     });
 
+    // Toggle advanced metrics
+    if (elements.btnToggleMetrics) {
+        elements.btnToggleMetrics.addEventListener('click', () => {
+            toggleAdvancedMetrics();
+        });
+    }
+
     // Initial Selection
     selectClam(state.selectedClamId);
 
     // Start random data fluctuation
     setInterval(fluctuateData, 2000);
-    
+
     // Add initial log
     addLog('系統已初始化。人工蛤蜊監測網上線。', false);
+}
+
+// Toggle advanced metrics panel
+function toggleAdvancedMetrics(forceExpand = null) {
+    if (!elements.extraMetrics || !elements.btnToggleMetrics) return;
+
+    const isExpanded = forceExpand !== null ? forceExpand : !elements.extraMetrics.classList.contains('expanded');
+    if (isExpanded) {
+        elements.extraMetrics.classList.add('expanded');
+        elements.btnToggleMetrics.classList.add('expanded');
+        elements.btnToggleMetrics.setAttribute('aria-label', '收合水質數據');
+        elements.btnToggleMetrics.setAttribute('title', '收合水質數據');
+    } else {
+        elements.extraMetrics.classList.remove('expanded');
+        elements.btnToggleMetrics.classList.remove('expanded');
+        elements.btnToggleMetrics.setAttribute('aria-label', '展開水質數據');
+        elements.btnToggleMetrics.setAttribute('title', '展開水質數據');
+    }
 }
 
 // Select a clam to view its data
@@ -136,6 +163,9 @@ window.simulatePollution = function(factoryId) {
     elements.sysStatus.classList.add('alert');
     elements.sysStatusText.textContent = '觀測到異常閉合，啟動感測器...';
     
+    // Auto expand advanced metrics panel
+    toggleAdvancedMetrics(true);
+
     // Log event
     const time1 = new Date().toLocaleTimeString();
     const msg1 = `【階段一】位於 <strong>${clam.name}</strong> 的蛤蜊群體觀測到異常的大規模閉合行為 (閉合率達 85.5%)。系統已自動啟動該區域水質進階感測程序...`;
@@ -183,6 +213,9 @@ window.resetSystem = function(silent = false) {
     elements.sysStatus.classList.remove('alert');
     elements.sysStatusText.textContent = '系統監控中';
     
+    // Auto collapse advanced metrics panel
+    toggleAdvancedMetrics(false);
+
     updateDashboard();
     if (!silent) {
         addLog('系統已重置。恢復正常監測。', false);

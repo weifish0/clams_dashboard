@@ -286,24 +286,87 @@ main {
 /* Metrics Banner */
 .metrics-banner {
     position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
+    top: 0.8rem;
+    left: 0.8rem;
     display: flex;
     align-items: center;
     z-index: 20;
-    padding: 0.6rem 1.2rem;
-    border-radius: 40px;
+    padding: 0rem 1rem;
+    width: fit-content;
+    max-width: calc(100% - 3rem);
+    min-height: 62px;
+    border-radius: 30px;
     background: rgba(13, 17, 23, 0.75);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-color);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    width: max-content;
 }
 
 .metric-row {
     display: flex;
-    gap: 1.2rem;
+    align-items: center;
+    min-width: 0;
+}
+
+.metric-row > .metric-item {
+    margin-right: 1rem;
+}
+
+.extra-metrics {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow: hidden;
+    min-width: 0;
+    max-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+                opacity 0.3s ease,
+                visibility 0.4s ease,
+                margin-right 0.4s ease;
+    margin-right: 0;
+}
+
+.extra-metrics.expanded {
+    max-width: 600px;
+    opacity: 1;
+    visibility: visible;
+    margin-right: 1rem;
+}
+
+.btn-toggle-metrics {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    outline: none;
+    flex-shrink: 0;
+}
+
+.btn-toggle-metrics:hover {
+    background: rgba(88, 166, 255, 0.15);
+    color: var(--accent-blue);
+    border-color: rgba(88, 166, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.btn-toggle-metrics i {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-toggle-metrics.expanded i {
+    transform: rotate(180deg);
 }
 
 .metric-item {
